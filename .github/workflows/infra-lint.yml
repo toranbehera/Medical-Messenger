@@ -1,7 +1,6 @@
 name: infra-lint
 
 on:
-  workflow_dispatch:
   pull_request:
     paths:
       - 'infra/**'
