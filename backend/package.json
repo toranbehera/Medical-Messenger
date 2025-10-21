@@ -16,11 +16,13 @@
   },
   "dependencies": {
     "@fastify/cors": "^8.5.0",
+    "@fastify/websocket": "^11.2.0",
     "dotenv": "^17.2.3",
     "fastify": "^4.29.1",
     "mongodb": "^6.20.0",
     "pino": "^8.16.2",
     "pino-pretty": "^10.2.3",
+    "socket.io": "^4.8.1",
     "zod": "^3.22.4"
   },
   "devDependencies": {

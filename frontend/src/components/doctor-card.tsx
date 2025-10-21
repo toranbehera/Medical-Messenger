@@ -1,7 +1,11 @@
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import type { Doctor } from '@/types/doctor';
+import { Button } from './ui/button';
+import { useRouter } from 'next/navigation';
 
 export function DoctorCard({ doctor }: { doctor: Doctor }) {
+  const router = useRouter();
+
   return (
     <Card>
       <CardHeader>
@@ -19,6 +23,12 @@ export function DoctorCard({ doctor }: { doctor: Doctor }) {
             Availability: {doctor.availability}
           </div>
         </div>
+        <Button
+          className="mt-5"
+          onClick={() => router.push(`/doctors/${doctor.id}`)}
+        >
+          Subscribe
+        </Button>
       </CardContent>
     </Card>
   );

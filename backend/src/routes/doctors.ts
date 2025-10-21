@@ -33,4 +33,15 @@ export async function doctorRoutes(fastify: FastifyInstance): Promise<void> {
     const doctors: DoctorsResponse = doctorsData as Doctor[];
     return reply.send(doctors);
   });
+
+  fastify.get('/doctors/:id', async (request, reply) => {
+    const { id } = request.params as { id: string };
+    const doctor = doctorsData.find((d) => d.id === id);
+
+    if (!doctor) {
+      return reply.status(404).send({ error: 'Doctor not found' });
+    }
+
+    return reply.send(doctor);
+  });
 }

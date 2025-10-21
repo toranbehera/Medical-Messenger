@@ -1,5 +1,6 @@
 import Fastify from 'fastify';
 import cors from '@fastify/cors';
+import { Server } from 'socket.io';
 import { healthRoutes } from './routes/health.js';
 import { doctorRoutes } from './routes/doctors.js';
 import { subscriptionRoutes } from './routes/subscriptions.js';
@@ -52,6 +53,27 @@ fastify.register(cors, {
     'https://medmsg-frontend-static.azurewebsites.net',
   ],
   credentials: true,
+});
+
+// Socket.io server
+const io = new Server(fastify.server, {
+  cors: { origin: ['http://localhost:3000'], credentials: true },
+});
+
+io.on('connection', (socket) => {
+  console.log('Client connected', socket.id);
+
+  socket.on('joinRoom', (doctorId: string) =>
+    socket.join(`doctor-${doctorId}`)
+  );
+
+  socket.on('sendMessage', ({ doctorId, message, sender }) => {
+    io.to(`doctor-${doctorId}`).emit('receiveMessage', {
+      message,
+      sender,
+      timestamp: new Date().toISOString(),
+    });
+  });
 });
 
 // Register routes
