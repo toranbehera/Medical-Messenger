@@ -73,7 +73,7 @@ export default function DoctorChat({ doctor, patientId }: DoctorChatProps) {
         body: JSON.stringify({
           fromUserId: patientId,
           toUserId: doctor.id,
-          subscriptionId: 'dummy-subscription-id', // replace with real subscriptionId
+          subscriptionId: 'dummy-subscription-id',
           body: msg.message,
         }),
       });

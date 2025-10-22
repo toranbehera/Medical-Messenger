@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@fastify/cors": "^8.5.0",
+    "@fastify/static": "6",
     "@fastify/websocket": "^11.2.0",
     "dotenv": "^17.2.3",
     "fastify": "^4.29.1",

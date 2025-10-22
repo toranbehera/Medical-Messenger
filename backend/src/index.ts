@@ -1,11 +1,13 @@
 import Fastify from 'fastify';
 import cors from '@fastify/cors';
+import fastifyStatic from '@fastify/static';
 import { Server } from 'socket.io';
 import { healthRoutes } from './routes/health.js';
 import { doctorRoutes } from './routes/doctors.js';
 import { subscriptionRoutes } from './routes/subscriptions.js';
 import { messageRoutes } from './routes/messages.js';
 import { env } from './env.js';
+import path from 'path';
 
 const fastify = Fastify({
   logger: {
@@ -19,6 +21,15 @@ const fastify = Fastify({
       },
     },
   },
+});
+
+fastify.get('/', async (request, reply) => {
+  reply.send({ message: 'Backend is running successfully 🚀' });
+});
+
+// Serve static frontend
+fastify.register(fastifyStatic, {
+  root: path.join(__dirname, 'public'), // folder containing built frontend files
 });
 
 // Add request logging
@@ -82,6 +93,16 @@ fastify.register(doctorRoutes, { prefix: '/api/v1' });
 fastify.register(subscriptionRoutes, { prefix: '/api/v1' });
 fastify.register(messageRoutes, { prefix: '/api/v1' });
 
+// Serve index.html for any frontend route
+fastify.setNotFoundHandler((req, reply) => {
+  if (req.raw.url && !req.raw.url.startsWith('/api')) {
+    return reply.sendFile('index.html');
+  }
+
+  return reply.status(404).send({ error: 'Not found' });
+});
+
+// Start server
 const start = async (): Promise<void> => {
   try {
     const port = env.PORT;

@@ -52,4 +52,19 @@ export async function messageRoutes(fastify: FastifyInstance) {
       }
     }
   );
+
+  // Endpoint to get chat messages
+  fastify.get('/messages', async (request, reply) => {
+    try {
+      const db = await getDb();
+      const messagesCollection = db.collection('messages');
+
+      const messages = await messagesCollection.find({}).toArray();
+
+      reply.send(messages);
+    } catch (err) {
+      fastify.log.error(err);
+      reply.status(500).send({ error: 'Failed to retrieve messages' });
+    }
+  });
 }
