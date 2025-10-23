@@ -366,7 +366,7 @@ async function seedDoctors() {
 
 // Run if called directly
 if (require.main === module) {
-  seedDoctors();
+  // seedDoctors();
 }
 
 export { seedDoctors };

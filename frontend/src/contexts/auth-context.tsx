@@ -1,11 +1,11 @@
 'use client';
 
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useState } from 'react';
 import { z } from 'zod';
+import { postData } from '@/lib/api';
 
 const UserSchema = z.object({
   id: z.string(),
-  username: z.string(),
   email: z.string(),
   role: z.enum(['patient', 'doctor', 'admin']),
 });
@@ -26,57 +26,29 @@ interface AuthContextType {
   updateProfile: (data: { username?: string; email?: string }) => Promise<void>;
 }
 
+interface ILoginResponse {
+  message: string;
+  user: User;
+}
+
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  const fetchUser = async () => {
-    try {
-      const response = await fetch('http://localhost:4000/api/v1/auth/me', {
-        credentials: 'include',
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setUser(UserSchema.parse(data.user));
-      } else {
-        setUser(null);
-      }
-    } catch (error) {
-      console.error('Failed to fetch user:', error);
-      setUser(null);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchUser();
-  }, []);
+  const [loading, setLoading] = useState<boolean>(true);
 
   const login = async (email: string, password: string) => {
-    const response = await fetch('/api/v1/auth/login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      credentials: 'include',
-      body: JSON.stringify({ email, password }),
-    });
+    const data = {
+      email,
+      password,
+    };
 
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error || 'Login failed');
-    }
-
-    const data = await response.json();
-    setUser(UserSchema.parse(data.user));
+    const response = await postData<ILoginResponse>('/api/v1/auth/login', data);
+    setUser(response.user);
+    setLoading(false);
   };
 
   const register = async (
-    username: string,
     email: string,
     password: string,
     role = 'patient'
@@ -87,7 +59,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         'Content-Type': 'application/json',
       },
       credentials: 'include',
-      body: JSON.stringify({ username, email, password, role }),
+      body: JSON.stringify({ email, password, role }),
     });
 
     if (!response.ok) {
@@ -97,6 +69,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const data = await response.json();
     setUser(UserSchema.parse(data.user));
+    setLoading(false);
   };
 
   const logout = async () => {
