@@ -35,9 +35,11 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const login = async (email: string, password: string) => {
+    setLoading(true);
+
     const data = {
       email,
       password,
@@ -53,6 +55,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     password: string,
     role = 'patient'
   ) => {
+    setLoading(true);
+
     const response = await fetch('/api/v1/auth/register', {
       method: 'POST',
       headers: {
@@ -73,11 +77,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const logout = async () => {
+    setLoading(true);
+
     await fetch('/api/v1/auth/logout', {
       method: 'POST',
       credentials: 'include',
     });
+
     setUser(null);
+    setLoading(false);
   };
 
   const updateProfile = async (data: { username?: string; email?: string }) => {
