@@ -1,6 +1,6 @@
 import mongoose, { Document, Schema } from 'mongoose';
 
-export interface IDoctor extends Document {
+export interface IDoctor extends Document<string> {
   id: string;
   email: string;
   password: string;

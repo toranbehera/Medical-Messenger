@@ -8,7 +8,8 @@ import { subscriptionRoutes } from './routes/subscriptions';
 import { messageRoutes } from './routes/messages';
 import { authRoutes } from './routes/auth';
 import { env } from './env';
-import { connectToDatabase } from './database/connection';
+import { connectDatabase } from './database/connection';
+import type { SessionStore } from '@fastify/session';
 
 const fastify = Fastify({
   logger: {
@@ -69,7 +70,7 @@ fastify.register(session, {
   },
   store: MongoStore.create({
     mongoUrl: env.MONGODB_URI,
-  }),
+  }) as unknown as SessionStore,
 });
 
 // Register routes
@@ -82,7 +83,7 @@ fastify.register(messageRoutes, { prefix: '/api/v1' });
 const start = async (): Promise<void> => {
   try {
     // Connect to database
-    await connectToDatabase(fastify.log);
+    await connectDatabase();
 
     const port = env.PORT;
     await fastify.listen({ port, host: '0.0.0.0' });
